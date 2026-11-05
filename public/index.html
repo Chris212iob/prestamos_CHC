@@ -5,6 +5,7 @@
 <html lang="es">
 
 <!-- Inicia la sección de configuración de la página (no se ve en pantalla). -->
+
 <head>
 
   <!-- Permite mostrar correctamente acentos, la letra ñ y otros caracteres.
@@ -28,10 +29,11 @@
   <!-- Carga nuestros estilos. Al ir después, sus reglas tienen prioridad sobre Bootstrap. -->
   <link rel="stylesheet" href="estilos.css">
 
-<!-- Termina la sección de configuración. -->
+  <!-- Termina la sección de configuración. -->
 </head>
 
 <!-- Inicia el cuerpo: todo lo que el usuario ve en la página. -->
+
 <body>
 
   <!-- Encabezado de la página: título, datos del grupo y menú. -->
@@ -59,23 +61,47 @@
 
       <!-- Abre otra página de la misma carpeta. -->
       <a href="requerimientos.html">Requerimientos</a>
+      <!-- ACTIVIDAD 10: botón para cerrar la sesión del encargado.
+ hidden: empieza oculto; app.js lo muestra cuando hay sesión. -->
+      <button id="salir" type="button" class="btn btn-outline-light btn-sm" hidden>Salir</button>
 
-    <!-- Termina el menú. -->
+      <!-- Termina el menú. -->
     </nav>
 
-  <!-- Termina el encabezado. -->
+    <!-- Termina el encabezado. -->
   </header>
 
   <!-- main: contenido principal de la página. Solo debe haber uno. -->
   <main>
+
+    <!-- ACTIVIDAD 10: acceso del encargado (RF01).
+ Es lo único que se ve mientras NO hay sesión. -->
+    <section id="acceso">
+
+      <h2>Acceso del encargado</h2>
+
+      <!-- id="entrar": app.js escucha el submit de este formulario.
+   type="password": la clave se ve como puntos. -->
+      <form id="entrar">
+
+        <label>Clave del encargado <input name="clave" type="password" required autocomplete="current-
+  password"></label>
+
+        <button type="submit" class="btn btn-primary">Entrar</button>
+      </form>
+
+      <!-- Aquí app.js escribe "Clave incorrecta" o "Sesión cerrada". -->
+      <p id="aviso-acceso" role="status" aria-live="polite"></p>
+
+    </section>
+
 
     <!--
       section: agrupa un bloque de contenido relacionado.
       id="captura": nombre único que usa el enlace "Registrar" del menú
       y que después usará JavaScript.
     -->
-    <section id="captura">
-
+    <section id="captura" hidden>
       <!-- h2: subtítulo de la sección (nivel inferior a h1). -->
       <h2>Registrar préstamo</h2>
 
@@ -102,7 +128,7 @@
           <!-- Campo para el nombre del alumno, con las mismas reglas. -->
           <label>Alumno <input name="alumno" required minlength="2" maxlength="60"></label>
 
-        <!-- Termina el grupo de campos. -->
+          <!-- Termina el grupo de campos. -->
         </div>
 
         <!--
@@ -113,7 +139,7 @@
         -->
         <button type="submit" class="btn btn-primary">Guardar préstamo</button>
 
-      <!-- Termina el formulario. -->
+        <!-- Termina el formulario. -->
       </form>
 
       <!-- ACTIVIDAD 7 (corrección O1): el mensaje se movió aquí, debajo del botón,
@@ -122,11 +148,11 @@
            el mensaje cuando cambia, sin interrumpir al usuario. -->
       <p id="mensaje" role="status" aria-live="polite"></p>
 
-    <!-- Termina la sección de captura. -->
+      <!-- Termina la sección de captura. -->
     </section>
 
     <!-- Sección de consulta. id="lista" es el destino del enlace "Consultar". -->
-    <section id="lista">
+    <section id="lista" hidden>
 
       <!-- Subtítulo de la sección. -->
       <h2>Préstamos registrados</h2>
@@ -145,10 +171,10 @@
       <!-- ul: lista vacía; JavaScript agregará un elemento li por cada préstamo. -->
       <ul id="registros"></ul>
 
-    <!-- Termina la sección de consulta. -->
+      <!-- Termina la sección de consulta. -->
     </section>
 
-  <!-- Termina el contenido principal. -->
+    <!-- Termina el contenido principal. -->
   </main>
 
   <!-- footer: pie de página con el plantel y el aviso de que los datos son ficticios. -->
@@ -158,8 +184,9 @@
        Va al final del body para que el formulario ya exista. -->
   <script src="app.js"></script>
 
-<!-- Termina el cuerpo. -->
+  <!-- Termina el cuerpo. -->
 </body>
 
 <!-- Termina el documento HTML. -->
+
 </html>

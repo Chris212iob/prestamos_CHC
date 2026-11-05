@@ -29,7 +29,9 @@ body {
   Selector de grupo: la coma aplica la misma regla a header, main y footer.
   Limita el ancho y centra el contenido en pantallas grandes.
 */
-header, main, footer {
+header,
+main,
+footer {
   /* Ancho máximo de 960 px; en pantallas más chicas ocupa todo el ancho. */
   max-width: 960px;
   /* margin: auto centra el bloque horizontalmente. */
@@ -87,7 +89,9 @@ label {
 }
 
 /* Reglas comunes para los controles de formulario. */
-input, select, button {
+input,
+select,
+button {
   /* Los controles no heredan la fuente del body por defecto; inherit la copia. */
   font: inherit;
   /* Espacio interno: controles más cómodos de tocar en celular. */
@@ -101,7 +105,8 @@ input, select, button {
   ocupan todo el ancho disponible y tienen un borde gris visible.
   select todavía no se usa; queda listo para prácticas posteriores.
 */
-input, select {
+input,
+select {
   width: 100%;
   /* Borde de 1 px, línea continua, color gris azulado. */
   border: 1px solid #687889;
@@ -119,7 +124,8 @@ button {
   Dibuja un contorno naranja para que se sepa dónde está el usuario.
   Ayuda a quien navega sin mouse (accesibilidad).
 */
-button:focus-visible, a:focus-visible {
+button:focus-visible,
+a:focus-visible {
   outline: 3px solid #d68a00;
 }
 
@@ -174,7 +180,9 @@ li {
   }
 
   /* Menos espacio interno para aprovechar la pantalla pequeña. */
-  header, main, footer {
+  header,
+  main,
+  footer {
     padding: 12px;
   }
 }
@@ -183,22 +191,26 @@ li {
    NUEVO (Actividad 7) · Mensajes que escribe app.js
    ============================================================ */
 .ok {
-  color: #1d6b37;   /* verde: préstamo guardado */
+  color: #1d6b37;
+  /* verde: préstamo guardado */
 }
 
 .error {
-  color: #b3261e;   /* rojo: faltan datos */
+  color: #b3261e;
+  /* rojo: faltan datos */
 }
 
 /* NUEVO (Actividad 7) · Filas de la lista de préstamos */
 #registros {
   padding-left: 0;
-  list-style: none;            /* sin viñetas: cada fila es una tarjeta */
+  list-style: none;
+  /* sin viñetas: cada fila es una tarjeta */
 }
 
 #registros li {
   display: flex;
-  flex-wrap: wrap;             /* en celular el estado baja de línea */
+  flex-wrap: wrap;
+  /* en celular el estado baja de línea */
   justify-content: space-between;
   gap: 8px;
   padding: 10px 12px;
@@ -212,4 +224,17 @@ li {
   border-radius: 999px;
   background: #fff4dc;
   font-size: 0.9em;
+}
+
+/* ============================================================
+ NUEVO (Actividad 10) · Acceso del encargado
+ ============================================================ */
+#aviso-acceso {
+  min-height: 2em;
+  font-weight: bold;
+}
+
+/* El botón Salir se va al extremo derecho del menú. */
+#salir {
+  margin: 0 0 0 auto;
 }

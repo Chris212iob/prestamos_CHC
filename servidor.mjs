@@ -10,6 +10,11 @@ import http from 'node:http';                     // crea el servidor web
 import { readFile } from 'node:fs/promises';      // lee archivos del disco
 import path from 'node:path';                     // arma rutas de carpetas
 
+import { randomUUID } from 'node:crypto'; // NUEVO (A10) · genera identificadores únicos
+import { atenderApi, enviarJSON, leerJSON } from './api.mjs'; // NUEVO (A10) · nuestra API
+
+
+
 // ===== SECCIÓN 2 · CONFIGURACIÓN =====
 // Puerto: la "puerta" por la que el navegador entra al servidor.
 const PUERTO = 3000;
@@ -49,6 +54,18 @@ const PAGINA_404 = `<!doctype html>
 </body>
 </html>`;
 
+// NUEVO (A10) · La clave del encargado se lee del archivo .env (nunca se escribe aquí).
+process.loadEnvFile();
+const CLAVE_ENCARGADO = process.env.CLAVE_ENCARGADO;
+if (!CLAVE_ENCARGADO) {
+  console.log('Falta CLAVE_ENCARGADO en el archivo .env');
+  process.exit(1);
+}
+
+// NUEVO (A10) · Sesiones activas: identificadores de quien ya entró con la clave.
+const sesiones = new Set();
+
+
 // Comprobación: si ves la carpeta en la terminal, la configuración está bien.
 console.log('Carpeta pública:', CARPETA_PUBLICA);
 
@@ -65,6 +82,22 @@ function registrar(codigo, metodo, ruta) {
   console.log(`[${hora}] ${codigo} ${metodo} ${ruta}`);
 }
 
+// NUEVO (A10) · Busca la cookie "sesion" que el navegador envía en cada petición.
+function leerSesion(peticion) {
+  const galletas = (peticion.headers.cookie ?? '').split(';'); // "sesion=abc; otra=xyz"
+  for (const galleta of galletas) {
+    const partes = galleta.trim().split('='); // ["sesion", "abc"]
+    if (partes[0] === 'sesion') {
+      return partes[1];
+    }
+  }
+  return ''; // no trae sesión
+}
+// NUEVO (A10) · true si la cookie corresponde a una sesión activa.
+function tieneSesion(peticion) {
+  return sesiones.has(leerSesion(peticion));
+}
+
 // ===== SECCIÓN 4 · ATENDER CADA PETICIÓN =====
 // Esta función se ejecuta CADA VEZ que el navegador pide algo.
 const servidor = http.createServer(async (peticion, respuesta) => {
@@ -75,6 +108,50 @@ const servidor = http.createServer(async (peticion, respuesta) => {
     if (ruta === '/') {
       ruta = '/index.html';                     // la raíz abre la página principal
     }
+
+    // --- 4.1-A SESIÓN del encargado (A10 · apoyo docente) ---
+    // Entrar: si la clave coincide, se crea una sesión y se envía en una cookie.
+    if (ruta === '/api/entrar' && peticion.method === 'POST') {
+      const datos = await leerJSON(peticion);
+      if (datos.clave !== CLAVE_ENCARGADO) {
+        enviarJSON(respuesta, 401, { error: 'Clave incorrecta.' });
+        registrar(401, peticion.method, ruta);
+        return;
+      }
+      const id = randomUUID();
+      sesiones.add(id);
+      respuesta.setHeader('Set-Cookie', `sesion=${id}; HttpOnly; SameSite=Strict; Path=/`);
+      enviarJSON(respuesta, 200, { activa: true });
+      registrar(200, peticion.method, ruta);
+      return;
+    }
+    // Salir: se borra la sesión del servidor y la cookie del navegador.
+    if (ruta === '/api/salir' && peticion.method === 'POST') {
+      sesiones.delete(leerSesion(peticion));
+      respuesta.setHeader('Set-Cookie', 'sesion=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0');
+      enviarJSON(respuesta, 200, { activa: false });
+      registrar(200, peticion.method, ruta);
+      return;
+    }
+    // Estado: app.js pregunta al abrir la página si ya hay sesión.
+    if (ruta === '/api/sesion') {
+      enviarJSON(respuesta, 200, { activa: tieneSesion(peticion) });
+      registrar(200, peticion.method, ruta);
+      return;
+    }
+
+    // --- 4.1-B API PROTEGIDA: sin sesión no hay datos (401) ---
+    if (ruta.startsWith('/api/')) {
+      if (!tieneSesion(peticion)) {
+        enviarJSON(respuesta, 401, { error: 'Primero inicia sesión.' });
+        registrar(401, peticion.method, ruta);
+        return;
+      }
+      const codigo = await atenderApi(peticion, respuesta, ruta);
+      registrar(codigo, peticion.method, ruta);
+      return;
+    }
+
 
     // --- 4.2 UBICAR el archivo dentro de public ---
     const archivo = path.join(CARPETA_PUBLICA, ruta);
